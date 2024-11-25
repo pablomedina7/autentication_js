@@ -1,0 +1,16 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Panel de Administración</title>
+</head>
+<body>
+  <h1>Panel de Administración</h1>
+  <ul>
+    <% users.forEach(user => { %>
+      <li><%= user.email %> - Rol: <%= user.role %></li>
+    <% }) %>
+  </ul>
+  <a href="/">Volver al inicio</a>
+</body>
+</html>

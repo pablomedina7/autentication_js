@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="header">
+    <h1>Bienvenido, <strong><%= user.email %></strong>!</h1>
+    <form action="/auth/logout" method="POST" style="display: inline;">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+    </form>
+    
+  </div>
+
+  <div class="content">
+    <h2>Eres un usuario normal</h2>
+    <p>No tienes acceso a contenido de administrador.</p>
+  </div>
+</body>
+</html>
