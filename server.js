@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
 const csrf = require('csurf');
 const authRoutes = require('./routes/auth_routes');
 const path = require('path');
@@ -21,20 +20,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configurar sesiones con cookies seguras
-app.use(
-  session({
-    secret: process.env.SECRET_KEY || 'clave_secreta',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-    },
-  })
-);
-
 // Configurar protección CSRF
 const csrfProtection = csrf({ cookie: true });
 app.use(csrfProtection);
@@ -45,18 +30,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Gestión de errores de CSRF
-app.use((err, req, res, next) => {
-  if (err.code === 'EBADCSRFTOKEN') {
-    return res.status(403).send('Token CSRF inválido o ausente.');
-  }
-  next(err);
-});
-
-// Middleware global para manejar sesiones y JWT
+// Middleware global para manejar JWT
 app.use((req, res, next) => {
   const token = req.cookies.jwt;
-
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.SECRET_KEY || 'clave_secreta');
@@ -82,7 +58,7 @@ app.get('/', (req, res) => {
   res.render('home', {
     loginError: null,
     registerError: null,
-    user: req.session.user || null,
+    user: req.user || null,
   });
 });
 

@@ -9,11 +9,7 @@ exports.renderHome = (req, res) => {
 exports.loginUser = async (req, res) => {
   const { email, password, remember } = req.body;
 
-  console.log('Datos recibidos en Login:', req.body);
-
   const user = await User.findByEmail(email);
-  console.log('Usuario encontrado:', user);
-
   if (!user) {
     return res.status(401).render('home', {
       loginError: 'Credenciales inválidas',
@@ -22,8 +18,6 @@ exports.loginUser = async (req, res) => {
   }
 
   const passwordMatches = bcrypt.compareSync(password, user.password);
-  console.log('Contraseña correcta:', passwordMatches);
-
   if (!passwordMatches) {
     return res.status(401).render('home', {
       loginError: 'Credenciales inválidas',
@@ -32,12 +26,11 @@ exports.loginUser = async (req, res) => {
   }
 
   const token = generateToken(user);
-  console.log('Token generado:', token);
 
   res.cookie('jwt', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    maxAge: remember ? 3600000 : 1800000,
+    maxAge: remember ? 3600000 : 1800000, // 1 hora o 30 minutos
   });
 
   if (user.role === 'admin') {
@@ -46,16 +39,8 @@ exports.loginUser = async (req, res) => {
   return res.redirect('/auth/dashboard');
 };
 
-
-
-
-
-
-
 exports.registerUser = async (req, res) => {
   const { email, password, confirmPassword, role } = req.body;
-
-  console.log('Datos recibidos en el registro:', req.body);
 
   if (await User.findByEmail(email)) {
     return res.status(400).render('home', {
@@ -72,38 +57,22 @@ exports.registerUser = async (req, res) => {
   }
 
   const hashedPassword = bcrypt.hashSync(password, 8);
-  console.log('Hash generado:', hashedPassword);
-
   const user = new User(email, hashedPassword, role);
   await User.addUser(user);
-
-  console.log('Usuario registrado exitosamente:', user);
 
   res.redirect('/');
 };
 
-
-
-
-
 exports.renderDashboard = async (req, res) => {
-  const user = req.user || req.session.user; // Obtener el usuario desde el token o sesión
-
+  const user = req.user;
   if (!user) {
-    return res.redirect('/'); // Si no hay usuario, redirigir al inicio
+    return res.redirect('/');
   }
 
-  // Verificar el rol del usuario
   if (user.role === 'admin') {
-    const users = await User.getAllUsers(); // Obtener todos los usuarios para el panel de admin
+    const users = await User.getAllUsers();
     return res.render('admin_dashboard', { user, users });
   }
 
-  // Redirigir al panel de usuario normal
   res.render('user_dashboard', { user });
 };
-
-
-
-
-

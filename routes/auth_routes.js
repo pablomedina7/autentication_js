@@ -17,14 +17,9 @@ router.post('/register', registerUser);
 router.get('/dashboard', verifyjwt, renderDashboard);
 
 router.post('/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error('Error al destruir la sesión:', err);
-      return res.status(500).send('Error al cerrar sesión');
-    }
-    res.clearCookie('jwt'); // Limpiar token JWT
-    res.redirect('/');
-  });
+  res.clearCookie('jwt');
+  res.redirect('/');
 });
+
 
 module.exports = router;

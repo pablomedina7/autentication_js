@@ -1,5 +1,4 @@
-const db = require('../db/db'); // Asegúrate de que la ruta sea correcta
-const bcrypt = require('bcryptjs');
+const db = require('../db/db');
 
 class User {
   constructor(email, passwordHash, role) {
@@ -9,10 +8,8 @@ class User {
   }
 
   static async findByEmail(email) {
-    console.log('Buscando usuario con email:', email); // Log para depuración
     return await db('users').where({ email }).first();
   }
-  
 
   static async addUser(user) {
     return await db('users').insert({
